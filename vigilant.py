@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 import argparse
 from collections import deque
 import time
+import sys
 
 # Webhooks for alerts
 # discord_webhook = "https://discord.com/api/webhooks/<your-discord-webhook>"
@@ -120,32 +121,34 @@ def main():
     if args.domain is None:
         parser.print_help()
         return
+    try:
+        while True:
+            if args.surface:
+                forum_search(args.domain)
+                if not args.keep_alive:
+                    quit()
+            
+            if args.dark_only:
+                import socks
+                import socket
+                import stem
+                darknet_forum_search(args.domain)
+                if not args.keep_alive:
+                    quit()
 
-    while true:
-        if args.surface:
-            forum_search(args.domain)
-            if not args.keep_alive:
-                quit()
-        
-        if args.dark_only:
-            import socks
-            import socket
-            import stem
-            darknet_forum_search(args.domain)
-            if not args.keep_alive:
-                quit()
-
-        if args.dark:
-            import socks
-            import socket
-            import stem
-            forum_search(args.domain)
-            darknet_forum_search(args.domain)
-            if not args.keep_alive:
-                quit()
-        
-        print("Restarting the program in 60 seconds...")
-        time.sleep(60)  # Wait for 60 seconds before restarting
-
+            if args.dark:
+                import socks
+                import socket
+                import stem
+                forum_search(args.domain)
+                darknet_forum_search(args.domain)
+                if not args.keep_alive:
+                    quit()
+            
+            print("Restarting the program in 60 seconds...")
+            time.sleep(60)  # Wait for 60 seconds before restarting
+    except KeyboardInterrupt:
+        print("\nBye!")
+        sys.exit(0)
 if __name__ == '__main__':
     main()
